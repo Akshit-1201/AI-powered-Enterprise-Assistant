@@ -10,6 +10,7 @@ export function UploadPanel({ onUnauthorized }: { onUnauthorized: () => void }) 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function handle401(err: unknown): boolean {
@@ -56,6 +57,22 @@ export function UploadPanel({ onUnauthorized }: { onUnauthorized: () => void }) 
     }
   }
 
+  async function onDelete(id: number, filename: string) {
+    setError(null);
+    setNotice(null);
+    setDeletingId(id);
+    try {
+      await api.deleteDocument(id);
+      setDocs((prev) => prev.filter((d) => d.id !== id));
+      setNotice(`Removed “${filename}”.`);
+    } catch (err) {
+      if (handle401(err)) return;
+      setError(err instanceof ApiError ? err.message : "Delete failed.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div className="flex h-full flex-col p-4">
       <h2 className="text-sm font-semibold text-slate-700">Your documents</h2>
@@ -98,13 +115,24 @@ export function UploadPanel({ onUnauthorized }: { onUnauthorized: () => void }) 
             {docs.map((d) => (
               <li
                 key={d.id}
-                className="rounded-lg bg-white px-3 py-2 text-xs ring-1 ring-slate-200"
+                className="flex items-start justify-between gap-2 rounded-lg bg-white px-3 py-2 text-xs ring-1 ring-slate-200"
               >
-                <p className="truncate font-medium text-slate-700">{d.filename}</p>
-                <p className="text-slate-400">
-                  {d.chunk_count} chunk{d.chunk_count > 1 ? "s" : ""} ·{" "}
-                  {new Date(d.uploaded_at).toLocaleString()}
-                </p>
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-slate-700">{d.filename}</p>
+                  <p className="text-slate-400">
+                    {d.chunk_count} chunk{d.chunk_count > 1 ? "s" : ""} ·{" "}
+                    {new Date(d.uploaded_at).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => onDelete(d.id, d.filename)}
+                  disabled={deletingId === d.id}
+                  aria-label={`Delete ${d.filename}`}
+                  title="Delete document"
+                  className="shrink-0 rounded-md px-2 py-1 leading-none text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                >
+                  {deletingId === d.id ? "…" : "✕"}
+                </button>
               </li>
             ))}
           </ul>

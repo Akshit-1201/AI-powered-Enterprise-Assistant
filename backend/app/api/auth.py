@@ -9,6 +9,11 @@ from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserO
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Precomputed once at import: verified against on the missing-user branch so login takes
+# roughly the same time whether or not the account exists (avoids timing-based user
+# enumeration). (P1.8)
+_DUMMY_HASH = hash_password("invalid-placeholder-password-never-matches")
+
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(request: RegisterRequest) -> UserOut:
@@ -32,9 +37,11 @@ def login(request: LoginRequest) -> TokenResponse:
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.email == email).first()
-        # Verify even when the user is missing would be ideal to avoid timing leaks; for
-        # this scope a constant message is enough to avoid user enumeration.
-        if user is None or not verify_password(request.password, user.hashed_password):
+        # Always run a hash verification (against a dummy hash when the user is missing) so
+        # response time doesn't reveal whether the account exists.
+        hashed = user.hashed_password if user is not None else _DUMMY_HASH
+        password_ok = verify_password(request.password, hashed)
+        if user is None or not password_ok:
             raise HTTPException(status_code=401, detail="Incorrect email or password.")
         return TokenResponse(access_token=create_access_token(str(user.id)))
     finally:

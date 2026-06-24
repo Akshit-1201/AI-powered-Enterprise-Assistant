@@ -36,6 +36,10 @@ def get_chat_llm() -> ChatOpenAI:
         temperature=settings.chat_temperature,
         api_key=settings.openai_api_key,
         timeout=settings.request_timeout,
+        # Stream tokens so /ask/stream can surface them live. .invoke() (used by the
+        # non-streaming /ask and the router/guardrail) still returns a complete message;
+        # this only enables per-token callbacks that LangGraph's "messages" mode captures.
+        streaming=True,
     )
 
 

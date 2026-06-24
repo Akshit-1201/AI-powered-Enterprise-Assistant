@@ -35,9 +35,6 @@ class Settings(BaseSettings):
     # CORS (comma-separated origins).
     cors_origins: str = "http://localhost:3000"
 
-    # Phase 1 placeholder identity; replaced by the authenticated user in Phase 3 (D8 seam).
-    placeholder_user_id: str = "dev-user"
-
     # Phase 4: run the lightweight LLM guardrail classifier in addition to the regex
     # pre-filter. Adds one cheap LLM call per request; turn off to save latency/cost.
     enable_guardrail_llm: bool = True

@@ -41,8 +41,13 @@ class Ticket(Base):
 class ConversationMeta(Base):
     __tablename__ = "conversation_meta"
 
+    # Composite PK: a session_id is only unique *within* a user. Two users may reuse the
+    # same (e.g. client-supplied) session_id without colliding or mis-attributing the audit
+    # index (P0.3). Actual memory isolation is separately enforced by the checkpointer
+    # thread_id = "{user_id}:{session_id}"; this table is just the session index.
+    user_id = Column(String, primary_key=True)
     session_id = Column(String, primary_key=True)
-    user_id = Column(String, index=True, nullable=False)
+    title = Column(String, nullable=True)  # first user message (truncated); for the chat list
     created_at = Column(DateTime, default=utcnow, nullable=False)
     last_active = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 

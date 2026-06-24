@@ -7,12 +7,13 @@ import logging
 from pathlib import Path
 
 import openai
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.auth.dependencies import get_current_user
 from app.db.database import SessionLocal
 from app.db.models import Document, User
 from app.graph.llm import LLMNotConfigured
+from app.rag import store
 from app.rag.ingest import ALLOWED_EXTENSIONS, UnsupportedFileType, chunk_text, extract_text, index_chunks
 from app.schemas.documents import DocumentOut, UploadResponse
 
@@ -21,6 +22,25 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["documents"])
 
 MAX_BYTES = 10 * 1024 * 1024  # D3: 10 MB
+_READ_CHUNK = 1024 * 1024  # 1 MB read granularity
+
+
+def _read_capped(upload: UploadFile, max_bytes: int) -> bytes:
+    """Read the upload in bounded chunks, aborting with 413 the moment it exceeds the cap.
+
+    Never buffers an unbounded body into memory: a malicious multi-GB upload is rejected
+    after reading at most ~max_bytes, not after fully reading it (P0.2)."""
+    parts: list[bytes] = []
+    total = 0
+    while True:
+        chunk = upload.file.read(_READ_CHUNK)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > max_bytes:
+            raise HTTPException(status_code=413, detail="File exceeds the 10 MB limit.")
+        parts.append(chunk)
+    return b"".join(parts)
 
 
 @router.post("/documents/upload", response_model=UploadResponse)
@@ -37,9 +57,7 @@ def upload_document(
             detail=f"Unsupported file type '{ext or 'unknown'}'. Allowed: .pdf, .txt, .md.",
         )
 
-    data = file.file.read()
-    if len(data) > MAX_BYTES:
-        raise HTTPException(status_code=413, detail="File exceeds the 10 MB limit.")
+    data = _read_capped(file, MAX_BYTES)  # bounded read; 413 before buffering an oversized body
     if not data:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
@@ -90,5 +108,24 @@ def list_documents(current_user: User = Depends(get_current_user)) -> list[Docum
             .all()
         )
         return [DocumentOut.model_validate(d) for d in docs]
+    finally:
+        db.close()
+
+
+@router.delete("/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_document(document_id: int, current_user: User = Depends(get_current_user)) -> None:
+    """Delete one of the current user's documents and its chunk vectors. 404 if it doesn't
+    exist or belongs to another user (no cross-tenant deletion, no existence leak)."""
+    user_id = str(current_user.id)
+    db = SessionLocal()
+    try:
+        doc = db.get(Document, document_id)
+        if doc is None or doc.user_id != user_id:
+            raise HTTPException(status_code=404, detail="Document not found.")
+        # Remove the vectors first so a deleted document can never resurface in retrieval,
+        # then drop the relational row.
+        store.delete_chunks(document_id, user_id)
+        db.delete(doc)
+        db.commit()
     finally:
         db.close()

@@ -46,3 +46,11 @@ def query(query_embedding, k: int, user_id: str):
         n_results=k,
         where={"user_id": user_id},
     )
+
+
+def delete_chunks(document_id: int, user_id: str) -> None:
+    """Delete one document's chunk vectors, scoped to the owner (the user_id guard is
+    defense-in-depth on top of the globally-unique document_id)."""
+    get_collection().delete(
+        where={"$and": [{"document_id": document_id}, {"user_id": user_id}]}
+    )

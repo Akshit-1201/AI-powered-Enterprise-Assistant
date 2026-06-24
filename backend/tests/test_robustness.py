@@ -57,7 +57,9 @@ def test_tool_failure_is_graceful(monkeypatch):
     monkeypatch.setitem(nodes.TOOLS_BY_NAME, "boom", _Boom())
     ai = AIMessage(content="", tool_calls=[{"name": "boom", "args": {}, "id": "x", "type": "tool_call"}])
     out = nodes.tool_node({"messages": [ai], "tool_used": None})
-    assert "could not be completed" in out["messages"][0].content  # error captured, no raise
+    content = out["messages"][0].content
+    assert "could not be completed" in content  # error captured, no raise
+    assert "kaboom" not in content  # raw exception text never leaks into model context (P1.7)
 
 
 # ---- retrieval degrades when the vector store is down ----------------------
@@ -157,3 +159,27 @@ def test_guardrail_fails_open_on_llm_error(monkeypatch):
     monkeypatch.setattr(nodes, "get_chat_llm", lambda: _Boom())
     out = nodes.guardrail_node({"messages": [HumanMessage(content="a normal question")]})
     assert out["blocked"] is False  # never block legitimate input on a flaky check
+
+
+# ---- multi-tenancy seam fails loud, never silently (P0.4) ------------------
+
+def test_current_user_id_raises_when_unset():
+    import contextvars
+
+    from app.context import get_current_user_id
+
+    # A fresh context never had the id set -> fail loud rather than return a phantom default.
+    with pytest.raises(RuntimeError):
+        contextvars.Context().run(get_current_user_id)
+
+
+def test_current_user_id_returns_after_set():
+    import contextvars
+
+    from app.context import get_current_user_id, set_current_user_id
+
+    def _inside():
+        set_current_user_id("u42")
+        return get_current_user_id()
+
+    assert contextvars.Context().run(_inside) == "u42"

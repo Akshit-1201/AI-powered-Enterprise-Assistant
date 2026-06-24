@@ -48,11 +48,45 @@ export interface AskResponse {
   session_id: string;
 }
 
+// /ask/stream metadata, delivered as the final SSE event after the answer tokens.
+export interface StreamMeta {
+  intent: string;
+  tool_used: string | null;
+  sources: Array<Record<string, unknown>>;
+  session_id: string;
+}
+
+export interface StreamHandlers {
+  onToken: (text: string) => void;
+  onMeta: (meta: StreamMeta) => void;
+  onError?: (detail: string) => void;
+  onDone?: () => void;
+}
+
 export interface DocumentOut {
   id: number;
   filename: string;
   chunk_count: number;
   uploaded_at: string;
+}
+
+// Saved chat history.
+export interface Conversation {
+  session_id: string;
+  title: string | null;
+  created_at: string;
+  last_active: string;
+}
+
+export interface ConversationMessage {
+  role: "user" | "assistant";
+  text: string;
+}
+
+export interface ConversationDetail {
+  session_id: string;
+  title: string | null;
+  messages: ConversationMessage[];
 }
 
 export interface UploadResponse {
@@ -127,8 +161,94 @@ export const api = {
     });
   },
 
+  // Streaming variant of ask(). Uses fetch + a body reader (not EventSource, which can't
+  // send the Authorization header) and parses the SSE frames, dispatching to callbacks.
+  async askStream(
+    question: string,
+    sessionId: string | null,
+    handlers: StreamHandlers,
+  ): Promise<void> {
+    const headers = new Headers({ "Content-Type": "application/json" });
+    const token = getToken();
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE}/ask/stream`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          question,
+          ...(sessionId ? { session_id: sessionId } : {}),
+        }),
+      });
+    } catch {
+      throw new ApiError(0, "Cannot reach the backend. Is it running on " + API_BASE + "?");
+    }
+
+    // Auth/validation failures happen before streaming starts -> normal error body.
+    if (!res.ok || !res.body) {
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : null;
+      throw new ApiError(res.status, extractErrorMessage(data, res.status));
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE frames are separated by a blank line.
+      for (;;) {
+        const sep = buffer.indexOf("\n\n");
+        if (sep === -1) break;
+        const frame = buffer.slice(0, sep).trim();
+        buffer = buffer.slice(sep + 2);
+        if (!frame.startsWith("data:")) continue;
+        const json = frame.slice(5).trim();
+        if (!json) continue;
+
+        let evt: { type?: string; [k: string]: unknown };
+        try {
+          evt = JSON.parse(json);
+        } catch {
+          continue;
+        }
+        if (evt.type === "token") handlers.onToken(String(evt.text ?? ""));
+        else if (evt.type === "meta") handlers.onMeta(evt as unknown as StreamMeta);
+        else if (evt.type === "error") handlers.onError?.(String(evt.detail ?? "Something went wrong."));
+        else if (evt.type === "done") handlers.onDone?.();
+      }
+    }
+  },
+
   listDocuments() {
     return request<DocumentOut[]>("/documents", { method: "GET" });
+  },
+
+  deleteDocument(id: number) {
+    return request<null>(`/documents/${id}`, { method: "DELETE" });
+  },
+
+  listConversations() {
+    return request<Conversation[]>("/conversations", { method: "GET" });
+  },
+
+  getConversation(sessionId: string) {
+    return request<ConversationDetail>(
+      `/conversations/${encodeURIComponent(sessionId)}`,
+      { method: "GET" },
+    );
+  },
+
+  deleteConversation(sessionId: string) {
+    return request<null>(`/conversations/${encodeURIComponent(sessionId)}`, {
+      method: "DELETE",
+    });
   },
 
   uploadDocument(file: File) {

@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api import ask, auth, documents, health
+from app.api import ask, auth, conversations, documents, health
 from app.config import get_settings
 from app.db.database import init_db
 
@@ -43,6 +43,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router)
     app.include_router(ask.router)
     app.include_router(documents.router)
+    app.include_router(conversations.router)
     return app
 
 

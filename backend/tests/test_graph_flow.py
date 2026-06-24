@@ -141,11 +141,12 @@ def test_provided_session_id_is_echoed(stub, client):
     assert r.json()["session_id"] == "fixed-123"
 
 
-def test_conversation_meta_recorded(stub, client):
+def test_conversation_meta_recorded(stub, client, default_user):
     client.post("/ask", json={"question": "hello", "session_id": "meta-xyz"})
     db = SessionLocal()
     try:
-        assert db.get(ConversationMeta, "meta-xyz") is not None
+        # Composite PK is (user_id, session_id).
+        assert db.get(ConversationMeta, (str(default_user.id), "meta-xyz")) is not None
     finally:
         db.close()
 
@@ -184,3 +185,31 @@ def test_memory_is_isolated_per_user_even_with_shared_session_id(stub, client):
     msgs_b = " ".join(m.content for m in get_graph().get_state({"configurable": {"thread_id": f"{uid_b}:shared"}}).values["messages"])
     assert "apple" in msgs_a and "banana" not in msgs_a
     assert "banana" in msgs_b and "apple" not in msgs_b
+
+
+@pytest.mark.realauth
+def test_conversation_meta_is_per_user_for_shared_session_id(stub, client):
+    """Two users reusing the SAME session_id must get two distinct, correctly-attributed
+    index rows — not one colliding/mis-attributed row (P0.3)."""
+    from app.db.models import User
+
+    def headers(email):
+        client.post("/auth/register", json={"email": email, "password": "password123"})
+        token = client.post("/auth/login", json={"email": email, "password": "password123"}).json()["access_token"]
+        return {"Authorization": f"Bearer {token}"}
+
+    ha, hb = headers("meta_a@example.com"), headers("meta_b@example.com")
+    client.post("/ask", json={"question": "hello", "session_id": "dup"}, headers=ha)
+    client.post("/ask", json={"question": "hello", "session_id": "dup"}, headers=hb)
+
+    db = SessionLocal()
+    try:
+        uid_a = db.query(User).filter_by(email="meta_a@example.com").first().id
+        uid_b = db.query(User).filter_by(email="meta_b@example.com").first().id
+        rows = db.query(ConversationMeta).filter_by(session_id="dup").all()
+        owners = {r.user_id for r in rows}
+    finally:
+        db.close()
+
+    assert len(rows) == 2  # one row per (user, session), not a single colliding row
+    assert owners == {str(uid_a), str(uid_b)}
