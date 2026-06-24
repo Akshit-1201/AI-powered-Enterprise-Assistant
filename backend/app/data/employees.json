@@ -1,0 +1,34 @@
+[
+  {
+    "id": "E1001",
+    "name": "Priya Sharma",
+    "department": "Engineering",
+    "role": "Senior Engineer",
+    "leave_balance": 12,
+    "manager": "Rajesh Kumar"
+  },
+  {
+    "id": "E1002",
+    "name": "Arjun Mehta",
+    "department": "Finance",
+    "role": "Financial Analyst",
+    "leave_balance": 8,
+    "manager": "Anita Desai"
+  },
+  {
+    "id": "E1003",
+    "name": "Sara Khan",
+    "department": "Human Resources",
+    "role": "HR Manager",
+    "leave_balance": 15,
+    "manager": "Vikram Singh"
+  },
+  {
+    "id": "E1004",
+    "name": "Daniel Lee",
+    "department": "Sales",
+    "role": "Account Executive",
+    "leave_balance": 5,
+    "manager": "Anita Desai"
+  }
+]

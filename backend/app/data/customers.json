@@ -1,0 +1,23 @@
+[
+  {
+    "id": "C2001",
+    "name": "Acme Corp",
+    "tier": "Enterprise",
+    "account_status": "active",
+    "open_issues": 2
+  },
+  {
+    "id": "C2002",
+    "name": "Globex Ltd",
+    "tier": "Pro",
+    "account_status": "active",
+    "open_issues": 0
+  },
+  {
+    "id": "C2003",
+    "name": "Initech",
+    "tier": "Free",
+    "account_status": "suspended",
+    "open_issues": 5
+  }
+]

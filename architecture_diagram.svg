@@ -1,0 +1,302 @@
+<svg viewBox="0 0 1700 1260" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    .title{font-size:30px;font-weight:700;fill:#0f172a;}
+    .subtitle{font-size:14.5px;fill:#475569;}
+    .zlabel{font-size:13px;font-weight:700;letter-spacing:1.2px;}
+    .ctitle{font-size:13.5px;font-weight:600;fill:#0f172a;}
+    .csub{font-size:11px;fill:#64748b;}
+    .num{font-size:12px;font-weight:700;fill:#ffffff;}
+    .flowlbl{font-size:10.5px;fill:#334155;font-weight:600;}
+    .datalbl{font-size:10.5px;fill:#1d4ed8;font-weight:600;}
+    .branch{font-size:10.5px;fill:#0f766e;font-weight:700;}
+    .lg{font-size:11px;fill:#334155;}
+    .flow{fill:none;stroke:#475569;stroke-width:2;}
+    .data{fill:none;stroke:#2563eb;stroke-width:2;}
+    .dash{stroke-dasharray:6 4;}
+  </style>
+  <defs>
+    <marker id="arw" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7.5,3 L0,6 Z" fill="#475569"/>
+    </marker>
+    <marker id="arwL" markerWidth="9" markerHeight="9" refX="1.5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M7.5,0 L0,3 L7.5,6 Z" fill="#475569"/>
+    </marker>
+    <marker id="arwb" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7.5,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arwbL" markerWidth="9" markerHeight="9" refX="1.5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M7.5,0 L0,3 L7.5,6 Z" fill="#2563eb"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1700" height="1260" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="40" y="50" class="title">Enterprise AI Assistant &#8212; System Architecture</text>
+  <text x="40" y="80" class="subtitle">Next.js &#183; FastAPI &#183; LangGraph &#183; OpenAI (GPT-4o-mini) &#183; Chroma RAG &#183; SQLite &#183; JWT Auth</text>
+
+  <!-- Legend -->
+  <rect x="1180" y="26" width="490" height="74" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <line x1="1198" y1="48" x2="1238" y2="48" class="flow" marker-end="url(#arw)"/>
+  <text x="1246" y="52" class="lg">Control / request flow</text>
+  <line x1="1430" y1="48" x2="1470" y2="48" class="data" marker-end="url(#arwb)"/>
+  <text x="1478" y="52" class="lg">Data &amp; service access</text>
+  <line x1="1198" y1="78" x2="1238" y2="78" class="flow dash" marker-end="url(#arw)"/>
+  <text x="1246" y="82" class="lg">Response / async</text>
+  <text x="1432" y="82" class="lg" font-weight="700" fill="#b45309">&#128274;</text>
+  <text x="1454" y="82" class="lg">JWT-protected route</text>
+
+  <!-- ===================== ZONES ===================== -->
+  <!-- Client -->
+  <rect x="30" y="120" width="290" height="560" rx="16" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.6"/>
+  <text x="48" y="148" class="zlabel" fill="#1d4ed8">CLIENT &#183; FRONTEND</text>
+  <!-- Backend -->
+  <rect x="350" y="120" width="320" height="930" rx="16" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+  <text x="368" y="148" class="zlabel" fill="#4338ca">BACKEND &#183; FastAPI</text>
+  <!-- LangGraph -->
+  <rect x="700" y="120" width="500" height="930" rx="16" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+  <text x="718" y="148" class="zlabel" fill="#047857">ORCHESTRATION &#183; LangGraph spine (POST /ask)</text>
+  <!-- Tools -->
+  <rect x="1230" y="560" width="210" height="320" rx="16" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.6"/>
+  <text x="1246" y="586" class="zlabel" fill="#b45309">BUSINESS ACTIONS</text>
+  <!-- Data & External -->
+  <rect x="1470" y="120" width="200" height="930" rx="16" fill="#f8fafc" stroke="#64748b" stroke-width="1.6"/>
+  <text x="1486" y="148" class="zlabel" fill="#334155">DATA &amp; EXTERNAL</text>
+
+  <!-- ===================== CLIENT CARDS ===================== -->
+  <g filter="url(#shadow)">
+    <rect x="52" y="178" width="246" height="74" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.6"/>
+    <rect x="52" y="270" width="246" height="74" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.6"/>
+    <rect x="52" y="362" width="246" height="74" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.6"/>
+  </g>
+  <text x="72" y="208" class="ctitle">Login / Register View</text>
+  <text x="72" y="228" class="csub">email + password &#183; obtain JWT</text>
+  <text x="72" y="300" class="ctitle">Chat View</text>
+  <text x="72" y="320" class="csub">ask questions &#183; shows intent,</text>
+  <text x="72" y="335" class="csub">tool used &amp; sources</text>
+  <text x="72" y="392" class="ctitle">Upload Panel</text>
+  <text x="72" y="412" class="csub">submit documents for RAG</text>
+  <rect x="52" y="464" width="246" height="180" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="72" y="492" class="ctitle" fill="#1e40af">Auth handling</text>
+  <text x="72" y="516" class="csub">Stores the JWT after login and</text>
+  <text x="72" y="531" class="csub">attaches it as</text>
+  <text x="72" y="550" class="csub" font-family="monospace" fill="#1e3a8a">Authorization: Bearer &lt;token&gt;</text>
+  <text x="72" y="572" class="csub">on every protected request.</text>
+  <text x="72" y="600" class="csub">Logout clears the stored token.</text>
+
+  <!-- ===================== BACKEND ===================== -->
+  <!-- JWT middleware -->
+  <rect x="368" y="178" width="284" height="56" rx="10" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.6"/>
+  <text x="384" y="202" class="ctitle" fill="#3730a3">JWT Auth Middleware</text>
+  <text x="384" y="221" class="csub">verifies Bearer token &#183; resolves current user</text>
+
+  <text x="368" y="258" class="csub" font-weight="700" fill="#4338ca">API ENDPOINTS</text>
+  <g filter="url(#shadow)">
+    <rect x="368" y="268" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+    <rect x="368" y="320" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+    <rect x="368" y="372" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+    <rect x="368" y="424" width="284" height="48" rx="9" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <rect x="368" y="480" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+    <rect x="368" y="532" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+    <rect x="368" y="584" width="284" height="44" rx="9" fill="#ffffff" stroke="#6366f1" stroke-width="1.4"/>
+  </g>
+  <text x="384" y="295" class="ctitle" font-family="monospace" font-size="12.5">POST /auth/register</text>
+  <text x="384" y="347" class="ctitle" font-family="monospace" font-size="12.5">POST /auth/login</text>
+  <text x="384" y="399" class="ctitle" font-family="monospace" font-size="12.5">POST /auth/logout&#160;&#160;&#128274;</text>
+  <text x="384" y="453" class="ctitle" font-family="monospace" font-size="13" fill="#854d0e">POST /ask&#160;&#160;&#128274;&#160;&#160;&#9733; core</text>
+  <text x="384" y="507" class="ctitle" font-family="monospace" font-size="12.5">POST /documents/upload&#160;&#128274;</text>
+  <text x="384" y="559" class="ctitle" font-family="monospace" font-size="12.5">GET&#160;&#160;/documents&#160;&#160;&#128274;</text>
+  <text x="384" y="611" class="ctitle" font-family="monospace" font-size="12.5">GET&#160;&#160;/health</text>
+
+  <rect x="368" y="650" width="284" height="44" rx="9" fill="#eef2ff" stroke="#6366f1" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="384" y="668" class="csub" fill="#4338ca">&#128274; routes require a valid JWT;</text>
+  <text x="384" y="684" class="csub" fill="#4338ca">Pydantic validates every request body.</text>
+
+  <!-- ===================== LANGGRAPH NODES ===================== -->
+  <!-- 1 Guardrail -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="175" width="300" height="78" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="201" r="13" fill="#10b981"/><text x="826" y="206" class="num" text-anchor="middle">1</text>
+  <text x="850" y="200" class="ctitle">Guardrail / Validation</text>
+  <text x="850" y="219" class="csub">empty &#183; oversized &#183; prompt-injection</text>
+  <text x="850" y="235" class="csub">&#183; off-topic &#8594; reject early &amp; safely</text>
+
+  <!-- 2 Router -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="288" width="300" height="78" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="314" r="13" fill="#10b981"/><text x="826" y="319" class="num" text-anchor="middle">2</text>
+  <text x="850" y="313" class="ctitle">Router (intent classify)</text>
+  <text x="850" y="332" class="csub">LLM routing &#8594; knowledge | action</text>
+  <text x="850" y="348" class="csub">| general</text>
+
+  <!-- 3 Retrieve -->
+  <g filter="url(#shadow)">
+    <rect x="715" y="405" width="235" height="78" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="741" cy="431" r="13" fill="#10b981"/><text x="741" y="436" class="num" text-anchor="middle">3</text>
+  <text x="765" y="430" class="ctitle">Retrieve (RAG)</text>
+  <text x="765" y="449" class="csub">top-k from user&#8217;s docs,</text>
+  <text x="765" y="465" class="csub">filtered by user_id</text>
+
+  <!-- 4 Agent -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="520" width="300" height="82" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="548" r="13" fill="#10b981"/><text x="826" y="553" class="num" text-anchor="middle">4</text>
+  <text x="850" y="547" class="ctitle">Agent / Reasoning</text>
+  <text x="850" y="566" class="csub">LLM with tools bound &#8594; decide:</text>
+  <text x="850" y="582" class="csub">answer directly or call a tool</text>
+
+  <!-- 5 Tool Execution -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="640" width="300" height="78" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="666" r="13" fill="#10b981"/><text x="826" y="671" class="num" text-anchor="middle">5</text>
+  <text x="850" y="665" class="ctitle">Tool Execution</text>
+  <text x="850" y="684" class="csub">run the selected mock business</text>
+  <text x="850" y="700" class="csub">action &#183; return structured result</text>
+
+  <!-- 6 Generate -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="758" width="300" height="78" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="784" r="13" fill="#10b981"/><text x="826" y="789" class="num" text-anchor="middle">6</text>
+  <text x="850" y="783" class="ctitle">Generate</text>
+  <text x="850" y="802" class="csub">compose grounded final answer</text>
+  <text x="850" y="818" class="csub">from context + tool output</text>
+
+  <!-- 7 Checkpointer -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="876" width="300" height="80" rx="11" fill="#ffffff" stroke="#10b981" stroke-width="1.8"/>
+  </g>
+  <circle cx="826" cy="903" r="13" fill="#10b981"/><text x="826" y="908" class="num" text-anchor="middle">7</text>
+  <text x="850" y="902" class="ctitle">Checkpointer (memory)</text>
+  <text x="850" y="921" class="csub">persist state per</text>
+  <text x="850" y="937" class="csub">(user_id, session_id)</text>
+
+  <!-- ===================== TOOLS CHIPS ===================== -->
+  <g filter="url(#shadow)">
+    <rect x="1245" y="600" width="180" height="58" rx="9" fill="#ffffff" stroke="#f59e0b" stroke-width="1.6"/>
+    <rect x="1245" y="668" width="180" height="58" rx="9" fill="#ffffff" stroke="#f59e0b" stroke-width="1.6"/>
+    <rect x="1245" y="736" width="180" height="58" rx="9" fill="#ffffff" stroke="#f59e0b" stroke-width="1.6"/>
+    <rect x="1245" y="804" width="180" height="58" rx="9" fill="#ffffff" stroke="#f59e0b" stroke-width="1.6"/>
+  </g>
+  <text x="1260" y="625" class="ctitle" font-family="monospace" font-size="12">create_ticket</text>
+  <text x="1260" y="644" class="csub">&#8594; SQLite (persisted)</text>
+  <text x="1260" y="693" class="ctitle" font-family="monospace" font-size="12">fetch_employee_info</text>
+  <text x="1260" y="712" class="csub">&#8594; mock data</text>
+  <text x="1260" y="761" class="ctitle" font-family="monospace" font-size="12">fetch_customer_info</text>
+  <text x="1260" y="780" class="csub">&#8594; mock data</text>
+  <text x="1260" y="829" class="ctitle" font-family="monospace" font-size="12">generate_report</text>
+  <text x="1260" y="848" class="csub">&#8594; aggregate</text>
+
+  <!-- ===================== DATA / EXTERNAL ===================== -->
+  <g filter="url(#shadow)">
+    <rect x="1486" y="300" width="168" height="82" rx="11" fill="#ecfdf5" stroke="#10a37f" stroke-width="2"/>
+    <rect x="1486" y="460" width="168" height="78" rx="11" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+    <rect x="1486" y="620" width="168" height="78" rx="11" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+    <rect x="1486" y="760" width="168" height="86" rx="11" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+  </g>
+  <text x="1502" y="330" class="ctitle" fill="#0f766e">OpenAI API</text>
+  <text x="1502" y="350" class="csub">GPT-4o-mini</text>
+  <text x="1502" y="366" class="csub">chat, tool-calls &amp; embeddings</text>
+  <text x="1502" y="490" class="ctitle" fill="#6d28d9">Chroma</text>
+  <text x="1502" y="510" class="csub">vector store</text>
+  <text x="1502" y="526" class="csub">user-scoped doc chunks</text>
+  <text x="1502" y="650" class="ctitle" fill="#0e7490">Mock Data (JSON)</text>
+  <text x="1502" y="670" class="csub">employees.json</text>
+  <text x="1502" y="686" class="csub">customers.json</text>
+  <text x="1502" y="790" class="ctitle" fill="#334155">SQLite</text>
+  <text x="1502" y="810" class="csub">users &#183; tickets</text>
+  <text x="1502" y="826" class="csub">conversation metadata</text>
+
+  <!-- ===================== ARROWS ===================== -->
+  <!-- Frontend <-> Backend -->
+  <line x1="320" y1="312" x2="350" y2="312" class="flow" marker-start="url(#arwL)" marker-end="url(#arw)"/>
+  <rect x="298" y="280" width="76" height="28" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="336" y="292" class="flowlbl" text-anchor="middle">HTTPS/JSON</text>
+  <text x="336" y="303" class="flowlbl" text-anchor="middle">Bearer JWT</text>
+
+  <!-- /ask -> Guardrail -->
+  <path d="M652,448 C720,448 745,214 800,214" class="flow" marker-end="url(#arw)"/>
+
+  <!-- spine control flow -->
+  <line x1="950" y1="253" x2="950" y2="288" class="flow" marker-end="url(#arw)"/>
+  <path d="M880,366 C850,386 840,392 833,405" class="flow" marker-end="url(#arw)"/>
+  <text x="760" y="392" class="branch">knowledge</text>
+  <path d="M1075,366 C1140,420 1140,470 1075,520" class="flow" marker-end="url(#arw)"/>
+  <text x="1118" y="448" class="branch">action /</text>
+  <text x="1118" y="463" class="branch">general</text>
+  <path d="M860,483 C895,500 905,508 922,520" class="flow" marker-end="url(#arw)"/>
+  <line x1="950" y1="602" x2="950" y2="640" class="flow" marker-end="url(#arw)"/>
+  <line x1="950" y1="718" x2="950" y2="758" class="flow" marker-end="url(#arw)"/>
+  <line x1="950" y1="836" x2="950" y2="876" class="flow" marker-end="url(#arw)"/>
+
+  <!-- data access -->
+  <!-- Retrieve <-> Chroma -->
+  <path d="M950,444 C1120,444 1330,499 1486,499" class="data" marker-start="url(#arwbL)" marker-end="url(#arwb)"/>
+  <text x="1190" y="466" class="datalbl">vector search</text>
+  <!-- Agent <-> OpenAI -->
+  <path d="M1100,540 C1290,540 1320,341 1486,341" class="data" marker-start="url(#arwbL)" marker-end="url(#arwb)"/>
+  <text x="1205" y="430" class="datalbl">LLM + tool calls</text>
+  <!-- Tool Execution -> Tools -->
+  <line x1="1100" y1="678" x2="1230" y2="678" class="flow" marker-end="url(#arw)"/>
+  <text x="1128" y="668" class="flowlbl">invoke</text>
+  <!-- Tools -> Mock -->
+  <path d="M1425,700 C1450,700 1460,659 1486,659" class="data" marker-end="url(#arwb)"/>
+  <!-- Tools -> SQLite -->
+  <path d="M1425,800 C1450,800 1460,803 1486,803" class="data" marker-end="url(#arwb)"/>
+  <!-- Checkpointer -> SQLite -->
+  <path d="M1100,916 H1456 V804 H1486" class="data" marker-end="url(#arwb)"/>
+  <text x="1180" y="908" class="datalbl">save state</text>
+  <!-- Auth -> SQLite (users) -->
+  <path d="M652,342 H684 V1018 H1456 V820 H1486" class="data" marker-end="url(#arwb)"/>
+  <text x="690" y="334" class="datalbl">users</text>
+
+  <!-- response -->
+  <path d="M800,790 H692 V452 H652" class="flow dash" marker-end="url(#arw)"/>
+  <text x="700" y="560" class="flowlbl">response:</text>
+  <text x="700" y="575" class="flowlbl">answer, intent,</text>
+  <text x="700" y="590" class="flowlbl">tool, sources</text>
+
+  <!-- ===================== INGESTION PIPELINE ===================== -->
+  <rect x="350" y="1090" width="1320" height="140" rx="16" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.6"/>
+  <text x="368" y="1118" class="zlabel" fill="#7e22ce">DOCUMENT INGESTION PIPELINE &#183; RAG (runs on /documents/upload)</text>
+
+  <g filter="url(#shadow)">
+    <rect x="380" y="1135" width="190" height="64" rx="10" fill="#ffffff" stroke="#a855f7" stroke-width="1.6"/>
+    <rect x="620" y="1135" width="190" height="64" rx="10" fill="#ffffff" stroke="#a855f7" stroke-width="1.6"/>
+    <rect x="860" y="1135" width="190" height="64" rx="10" fill="#ffffff" stroke="#a855f7" stroke-width="1.6"/>
+    <rect x="1100" y="1135" width="190" height="64" rx="10" fill="#ffffff" stroke="#a855f7" stroke-width="1.6"/>
+    <rect x="1340" y="1135" width="300" height="64" rx="10" fill="#ffffff" stroke="#a855f7" stroke-width="1.6"/>
+  </g>
+  <text x="475" y="1166" class="ctitle" text-anchor="middle">Upload</text>
+  <text x="475" y="1185" class="csub" text-anchor="middle">authenticated file</text>
+  <text x="715" y="1166" class="ctitle" text-anchor="middle">Extract Text</text>
+  <text x="715" y="1185" class="csub" text-anchor="middle">parse document</text>
+  <text x="955" y="1166" class="ctitle" text-anchor="middle">Chunk</text>
+  <text x="955" y="1185" class="csub" text-anchor="middle">split into passages</text>
+  <text x="1195" y="1166" class="ctitle" text-anchor="middle">Embed</text>
+  <text x="1195" y="1185" class="csub" text-anchor="middle">OpenAI embeddings</text>
+  <text x="1490" y="1166" class="ctitle" text-anchor="middle">Store in Chroma</text>
+  <text x="1490" y="1185" class="csub" text-anchor="middle">tagged with user_id (isolation)</text>
+
+  <line x1="570" y1="1167" x2="620" y2="1167" class="flow" marker-end="url(#arw)"/>
+  <line x1="810" y1="1167" x2="860" y2="1167" class="flow" marker-end="url(#arw)"/>
+  <line x1="1050" y1="1167" x2="1100" y2="1167" class="flow" marker-end="url(#arw)"/>
+  <line x1="1290" y1="1167" x2="1340" y2="1167" class="flow" marker-end="url(#arw)"/>
+
+  <!-- upload endpoint -> ingestion -->
+  <path d="M368,517 H360 V1118 H430 V1135" class="flow" marker-end="url(#arw)"/>
+  <text x="368" y="842" class="flowlbl">file</text>
+  <!-- store -> Chroma -->
+  <path d="M1640,1150 H1688 V499 H1654" class="data dash" marker-end="url(#arwb)"/>
+  <text x="1610" y="1130" class="datalbl">index</text>
+
+</svg>
